@@ -1,6 +1,10 @@
 # compiled output
 /dist
+/client
 /node_modules
+/src/environments/*.ts
+/src/environments/*.js
+
 
 # Logs
 logs
@@ -27,9 +31,16 @@ lerna-debug.log*
 .settings/
 *.sublime-workspace
 
+
 # IDE - VSCode
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
+/.vscode/launch.json
 !.vscode/extensions.json
+
+# Config
+.env
+.env.bk
+private.key
