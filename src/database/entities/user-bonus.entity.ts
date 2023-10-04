@@ -10,7 +10,7 @@ import {
 } from 'sequelize-typescript';
 import { Bonus } from './bonus.entity';
 
-@Table({ underscored: true })
+@Table({ underscored: true, tableName: 'user_bonus' })
 export class UserBonus extends Model {
   @PrimaryKey
   @AutoIncrement
@@ -19,6 +19,9 @@ export class UserBonus extends Model {
 
   @Column(DataType.SMALLINT)
   bonusLimit: number;
+
+  @Column(DataType.SMALLINT)
+  userId: number;
 
   @ForeignKey(() => Bonus)
   @Column({ allowNull: false })

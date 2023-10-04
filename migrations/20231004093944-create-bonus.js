@@ -19,6 +19,20 @@ module.exports = {
         type: Sequelize.SMALLINT,
         allowNull: false,
       },
+      is_active: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: true,
+      },
+      created_at: {
+        allowNull: false,
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.fn('now'),
+      },
+      updated_at: {
+        allowNull: false,
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.fn('now'),
+      },
     });
   },
 

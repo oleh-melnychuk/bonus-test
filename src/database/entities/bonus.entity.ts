@@ -5,9 +5,11 @@ import {
   PrimaryKey,
   AutoIncrement,
   DataType,
+  HasMany,
 } from 'sequelize-typescript';
+import { UserBonus } from './user-bonus.entity';
 
-@Table({ underscored: true })
+@Table({ underscored: true, tableName: 'bonus' })
 export class Bonus extends Model {
   @PrimaryKey
   @AutoIncrement
@@ -19,4 +21,10 @@ export class Bonus extends Model {
 
   @Column(DataType.SMALLINT)
   userBonusLimit: number;
+
+  @Column(DataType.BOOLEAN)
+  isActive: boolean;
+
+  @HasMany(() => UserBonus)
+  userBonuses: UserBonus[];
 }

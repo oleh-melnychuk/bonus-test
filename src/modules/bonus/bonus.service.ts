@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import sequelize from 'sequelize';
+import { Op } from 'sequelize';
 import { Bonus } from '../../database/entities/bonus.entity';
 import { UserBonus } from '../../database/entities/user-bonus.entity';
 
@@ -8,19 +10,32 @@ export class BonusService {
   constructor(
     @InjectModel(Bonus)
     private bonusService: typeof Bonus,
+    @InjectModel(UserBonus)
+    private userBonusService: typeof UserBonus,
   ) {}
 
-  async getAvailableBonusesPerUser(userId: string) {
-    const res = await this.bonusService.findAll({
+  async getAvailableBonusesPerUser(userId: number) {
+    const bonuses = await this.bonusService.findAll({
       where: {
-        isActive: true,
-        'userBonus.id': null,
+        [Op.and]: [
+          sequelize.where(sequelize.col('userBonuses.id'), 'IS', null),
+          {
+            isActive: true,
+          },
+        ],
       },
-      include: [{ model: UserBonus, where: { userId } }],
+
+      include: [{ model: UserBonus, where: { userId }, required: false }],
     });
 
-    console.log(res);
+    await this.userBonusService.bulkCreate(
+      bonuses.map((b) => ({
+        bonusId: b.id,
+        userId,
+        bonusLimit: b.userBonusLimit,
+      })),
+    );
 
-    return [];
+    return bonuses.map((b) => b.id);
   }
 }

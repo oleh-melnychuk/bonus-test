@@ -1,3 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+require('dotenv').config();
+
 import { SequelizeModuleOptions } from '@nestjs/sequelize';
 import { Bonus } from './entities/bonus.entity';
 import { UserBonus } from './entities/user-bonus.entity';

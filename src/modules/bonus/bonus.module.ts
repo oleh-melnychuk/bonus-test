@@ -6,9 +6,9 @@ import { Bonus } from '../../database/entities/bonus.entity';
 import { UserBonus } from '../../database/entities/user-bonus.entity';
 
 @Module({
-  imports: [SequelizeModule.forFeature([Bonus, UserBonus])],
+  imports: [SequelizeModule.forFeature([UserBonus, Bonus])],
   controllers: [BonusController],
   providers: [BonusService],
-  exports: [BonusService],
+  exports: [BonusService, SequelizeModule],
 })
 export class BonusModule {}
