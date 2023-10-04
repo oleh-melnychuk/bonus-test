@@ -13,4 +13,7 @@ export const dataBaseConfig: SequelizeModuleOptions = {
   database: process.env.DATABASE_NAME,
   dialect: 'postgres',
   models: [UserBonus, Bonus],
+  dialectOptions: {
+    ssl: true,
+  },
 };

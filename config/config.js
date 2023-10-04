@@ -9,6 +9,9 @@ const dbConenction = {
   database: process.env.DATABASE_NAME,
   charset: 'utf8mb4',
   dialect: 'postgres',
+  dialectOptions: {
+    ssl: true,
+  },
 };
 
 module.exports = {
