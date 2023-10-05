@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/sequelize';
-import sequelize from 'sequelize';
+import { InjectConnection, InjectModel } from '@nestjs/sequelize';
+import sequelize, { Sequelize, Transaction } from 'sequelize';
 import { Op } from 'sequelize';
 import { Bonus } from '../../database/entities/bonus.entity';
 import { UserBonus } from '../../database/entities/user-bonus.entity';
@@ -12,30 +12,43 @@ export class BonusService {
     private bonusService: typeof Bonus,
     @InjectModel(UserBonus)
     private userBonusService: typeof UserBonus,
+    @InjectConnection()
+    private readonly sequelizeInstance: Sequelize,
   ) {}
 
   async getAvailableBonusesPerUser(userId: number) {
-    const bonuses = await this.bonusService.findAll({
-      where: {
-        [Op.and]: [
-          sequelize.where(sequelize.col('userBonuses.id'), 'IS', null),
-          {
-            isActive: true,
-          },
-        ],
-      },
+    const transaction: Transaction = await this.sequelizeInstance.transaction();
 
-      include: [{ model: UserBonus, where: { userId }, required: false }],
-    });
+    try {
+      const bonuses = await this.bonusService.findAll({
+        where: {
+          [Op.and]: [
+            sequelize.where(sequelize.col('userBonuses.id'), 'IS', null),
+            {
+              isActive: true,
+            },
+          ],
+        },
 
-    await this.userBonusService.bulkCreate(
-      bonuses.map((b) => ({
-        bonusId: b.id,
-        userId,
-        bonusLimit: b.userBonusLimit,
-      })),
-    );
+        include: [{ model: UserBonus, where: { userId }, required: false }],
+        transaction,
+      });
 
-    return bonuses.map((b) => b.id);
+      await this.userBonusService.bulkCreate(
+        bonuses.map(
+          (b) => ({
+            bonusId: b.id,
+            userId,
+            bonusLimit: b.userBonusLimit,
+          }),
+          { transaction },
+        ),
+      );
+
+      return bonuses.map((b) => b.id);
+    } catch (err) {
+      await transaction.rollback();
+      throw new Error(err);
+    }
   }
 }
