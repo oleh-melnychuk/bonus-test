@@ -4,9 +4,10 @@ import sequelize, { Sequelize, Transaction } from 'sequelize';
 import { Op } from 'sequelize';
 import { Bonus } from '../../database/entities/bonus.entity';
 import { UserBonus } from '../../database/entities/user-bonus.entity';
+import { IBonusService } from './types/bonus.interface';
 
 @Injectable()
-export class BonusService {
+export class BonusService implements IBonusService {
   constructor(
     @InjectModel(Bonus)
     private bonusService: typeof Bonus,
@@ -16,7 +17,7 @@ export class BonusService {
     private readonly sequelizeInstance: Sequelize,
   ) {}
 
-  async getAvailableBonusesPerUser(userId: number) {
+  async getAvailableBonusesPerUser(userId: number): Promise<number[]> {
     const transaction: Transaction = await this.sequelizeInstance.transaction();
 
     try {
@@ -44,6 +45,8 @@ export class BonusService {
           { transaction },
         ),
       );
+
+      await transaction.commit();
 
       return bonuses.map((b) => b.id);
     } catch (err) {
